@@ -8,7 +8,7 @@ class BatchGenerator:
         self.y = yy
         self.size = len(x)
         self.random_order = list(range(len(x)))
-        # np.random.shuffle(self.random_order)
+        np.random.shuffle(self.random_order)
         self.start = 0
         return
 
