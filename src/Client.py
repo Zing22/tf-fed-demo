@@ -46,7 +46,7 @@ class Clients:
         dataset = self.dataset.train[cid]
 
         with self.graph.as_default():
-            for _ in range(math.ceil(dataset.size // batch_size)):
+            for _ in range(math.ceil(dataset.size / batch_size)):
                 batch_x, batch_y = dataset.next_batch(batch_size)
                 feed_dict = {
                     self.model.X: batch_x,
@@ -71,9 +71,8 @@ class Clients:
     def choose_clients(self, ratio=1.0):
         """ randomly choose some clients """
         client_num = self.get_clients_num()
-        choose_num = math.floor(client_num * ratio)
+        choose_num = math.ceil(client_num * ratio)
         return np.random.permutation(client_num)[:choose_num]
 
     def get_clients_num(self):
         return len(self.dataset.train)
-    

@@ -64,7 +64,7 @@ for ep in range(epoch):
     for var in client_vars_sum:
         global_vars.append(var / len(random_clients))
 
-    # run test on 1000 instances
+    # run test on 600 instances
     run_global_test(client, global_vars, test_num=600)
 
 

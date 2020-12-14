@@ -8,23 +8,18 @@ class BatchGenerator:
         self.y = yy
         self.size = len(x)
         self.random_order = list(range(len(x)))
-        np.random.shuffle(self.random_order)
+        # np.random.shuffle(self.random_order)
         self.start = 0
         return
 
     def next_batch(self, batch_size):
-        if self.start + batch_size >= len(self.random_order):
-            overflow = (self.start + batch_size) - len(self.random_order)
-            perm0 = self.random_order[self.start:] +\
-                 self.random_order[:overflow]
-            self.start = overflow
-        else:
-            perm0 = self.random_order[self.start:self.start + batch_size]
-            self.start += batch_size
+        perm = self.random_order[self.start:self.start + batch_size]
 
-        assert len(perm0) == batch_size
+        self.start += batch_size
+        if self.start > self.size:
+            self.start = 0
 
-        return self.x[perm0], self.y[perm0]
+        return self.x[perm], self.y[perm]
 
     # support slice
     def __getitem__(self, val):
@@ -40,10 +35,8 @@ class Dataset(object):
             y_train = to_categorical(y_train, 10)
             y_test = to_categorical(y_test, 10)
 
-        x_train = x_train.astype('float32')
-        x_test = x_test.astype('float32')
-        x_train /= 255
-        x_test /= 255
+        x_train = x_train.astype('float32') / 255
+        x_test = x_test.astype('float32') / 255
 
         if split == 0:
             self.train = BatchGenerator(x_train, y_train)
@@ -52,11 +45,9 @@ class Dataset(object):
 
         self.test = BatchGenerator(x_test, y_test)
 
-    def splited_batch(self, x_data, y_data, count):
+    def splited_batch(self, x_data, y_data, split):
         res = []
-        l = len(x_data)
-        for i in range(0, l, l//count):
-            res.append(
-                BatchGenerator(x_data[i:i + l // count],
-                               y_data[i:i + l // count]))
+        for x, y in zip(np.split(x_data, split), np.split(y_data, split)):
+            assert len(x) == len(y)
+            res.append(BatchGenerator(x, y))
         return res
