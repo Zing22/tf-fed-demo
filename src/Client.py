@@ -54,6 +54,8 @@ class Clients:
                     self.model.DROP_RATE: dropout_rate
                 }
                 self.sess.run(self.model.train_op, feed_dict=feed_dict)
+        
+        return dataset.size
 
     def get_client_vars(self):
         """ Return all of the variables list """
